@@ -404,10 +404,6 @@ errs := HandleErrorsWithReturns(may, func (err error, v ...any) {
 
 Helper naming: helpers must be self explanatory and respect standards (other languages, libraries...). Feel free to suggest many names in your contributions.
 
-## 👤 Contributors
-
-![Contributors](https://contrib.rocks/image?repo=nekomeowww/fo)
-
 ## 📝 License
 
 Copyright © 2023 [Neko Ayaka](https://github.com/nekomeowww).
