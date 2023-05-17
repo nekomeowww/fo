@@ -187,7 +187,7 @@ func example5() (int, string, time.Date, bool, float64, error)
 func example6() (int, string, time.Date, bool, float64, byte, error)
 
 fo.May0(example0())
-val1 := fo.May1(example1())    // alias to Must
+val1 := fo.May1(example1())    // alias to May
 val1, val2 := fo.May2(example2())
 val1, val2, val3 := fo.May3(example3())
 val1, val2, val3, val4 := fo.May4(example4())
@@ -209,11 +209,11 @@ You can give context to the panic message by adding some printf-like arguments.
 
 ```go
 val, ok := any(someVar).(string)
-fo.May1(val, ok, "someVar must be a string, got '%s'", val)
+fo.May1(val, ok, "someVar may be a string, got '%s'", val)
 
 list := []int{0, 1, 2}
 item := 5
-fo.May0(lo.Contains[int](list, item), "'%s' must always contain '%s'", list, item)
+fo.May0(lo.Contains[int](list, item), "'%s' may always contain '%s'", list, item)
 ...
 ```
 
