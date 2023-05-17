@@ -14,6 +14,7 @@ var (
 	errNotOK = errors.New("not ok")
 )
 
+// MayHandler is a function that handles the error from May and May* functions.
 type MayHandler func(err error, messageArgs ...any)
 
 type Logger interface {
@@ -36,11 +37,6 @@ func WithLogFuncHandler(logFunc func(...any)) MayHandler {
 	}
 }
 
-var (
-	// Implementation check for mayHandlers to implement ErrorsCollectable.
-	_ ErrorsCollectable = (*mayHandlers)(nil)
-)
-
 // mayHandlers is a collection of MayHandler.
 type mayHandlers struct {
 	handlers []MayHandler
@@ -61,6 +57,50 @@ func (h *mayHandlers) Use(handler ...MayHandler) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	h.handlers = append(h.handlers, handler...)
+}
+
+// CollectAsError collects error from the invoked result from MayInvoker
+// for post error handling.
+//
+// The error can be extracted with
+//
+//	multierr.Errors().
+func (h *mayHandlers) CollectAsError() error {
+	return h.errs
+}
+
+// CollectAsErrors collects errors from the invoked result from
+// MayInvoker for post error handling.
+//
+// The errors can be combined with
+//
+//	multierr.Combine().
+func (h *mayHandlers) CollectAsErrors() []error {
+	if h.errs == nil {
+		return make([]error, 0)
+	}
+
+	return multierr.Errors(h.errs)
+}
+
+// HandleErrors executes the handler with the collected error from
+// MayInvoker.
+func (h *mayHandlers) HandleErrors(handler func(errs []error)) {
+	if h.errs == nil {
+		return
+	}
+
+	handler(multierr.Errors(h.errs))
+}
+
+// HandleErrorsWithReturn executes the handler with the collected error from
+// MayInvoker, and returns the error that handled by the handler.
+func (h *mayHandlers) HandleErrorsWithReturn(handler func(errs []error) error) error {
+	if h.errs == nil {
+		return nil
+	}
+
+	return handler(multierr.Errors(h.errs))
 }
 
 // messageFromMsgAndArgs constructs the message from the given msgAndArgs.
@@ -148,20 +188,4 @@ func (h *mayHandlers) handleError(anyErr any, messageArgs ...any) {
 
 	err = formatErrorWithMessageArgs(err, messageArgs...)
 	h.errs = multierr.Append(h.errs, err)
-}
-
-// implement for ErrorsCollectable. Returns errors as a single error,
-// can be extracted with multierr.Errors().
-func (h *mayHandlers) getCollectedError() error {
-	return h.errs
-}
-
-// implement for ErrorsHandleable. Returns errors as a slice of errors,
-// can be combined with multierr.Combine().
-func (h *mayHandlers) getCollectedErrors() []error {
-	if h.errs == nil {
-		return nil
-	}
-
-	return multierr.Errors(h.errs)
 }

@@ -2,6 +2,7 @@ package fo
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -357,4 +358,12 @@ func TestInvokeX(t *testing.T) {
 			assert.Equal(t, "bar", res6["foo"])
 		})
 	})
+}
+
+func BenchmarkInvoke(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = invoke(context.Background(), func() (any, error) {
+			return "string", errors.New("error")
+		})
+	}
 }

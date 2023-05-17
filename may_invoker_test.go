@@ -282,3 +282,25 @@ func TestNewMayX(t *testing.T) {
 		assert.Equal(t, "bar", res6["foo"])
 	})
 }
+
+func BenchmarkNewMay(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewMay0()
+	}
+}
+
+func BenchmarkNewMayInvoke(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewMay[string]().Invoke(func() (string, error) {
+			return "string", errors.New("error")
+		}())
+	}
+}
+
+func BenchmarkNewMayUse(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewMay0().Use(func(err error, messageArgs ...any) {
+			// noop
+		})
+	}
+}

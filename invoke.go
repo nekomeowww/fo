@@ -34,6 +34,7 @@ func invoke[R any](ctx context.Context, fn func() (R, error)) (R, error) {
 	return res, err
 }
 
+// Invoke0 has the same behavior as Invoke but without return value.
 func Invoke0(ctx context.Context, fn func() error) error {
 	_, err := invoke(ctx, func() (any, error) {
 		return nil, fn()
@@ -42,10 +43,13 @@ func Invoke0(ctx context.Context, fn func() error) error {
 	return err
 }
 
+// Invoke invokes the callback function and enables to control the
+// context of the callback function with 1 return value.
 func Invoke[R1 any](ctx context.Context, fn func() (R1, error)) (R1, error) {
 	return Invoke1(ctx, fn)
 }
 
+// Invoke1 is an alias of Invoke.
 func Invoke1[R1 any](ctx context.Context, fn func() (R1, error)) (R1, error) {
 	type result struct {
 		r1 R1
@@ -59,6 +63,7 @@ func Invoke1[R1 any](ctx context.Context, fn func() (R1, error)) (R1, error) {
 	return res.r1, err
 }
 
+// Invoke2 has the same behavior as Invoke but with 2 return values.
 func Invoke2[R1 any, R2 any](ctx context.Context, fn func() (R1, R2, error)) (R1, R2, error) {
 	type result struct {
 		r1 R1
@@ -73,6 +78,7 @@ func Invoke2[R1 any, R2 any](ctx context.Context, fn func() (R1, R2, error)) (R1
 	return res.r1, res.r2, err
 }
 
+// Invoke3 has the same behavior as Invoke but with 3 return values.
 func Invoke3[R1 any, R2 any, R3 any](ctx context.Context, fn func() (R1, R2, R3, error)) (R1, R2, R3, error) {
 	type result struct {
 		r1 R1
@@ -88,6 +94,7 @@ func Invoke3[R1 any, R2 any, R3 any](ctx context.Context, fn func() (R1, R2, R3,
 	return res.r1, res.r2, res.r3, err
 }
 
+// Invoke4 has the same behavior as Invoke but with 4 return values.
 func Invoke4[R1 any, R2 any, R3 any, R4 any](ctx context.Context, fn func() (R1, R2, R3, R4, error)) (R1, R2, R3, R4, error) {
 	type result struct {
 		r1 R1
@@ -104,6 +111,7 @@ func Invoke4[R1 any, R2 any, R3 any, R4 any](ctx context.Context, fn func() (R1,
 	return res.r1, res.r2, res.r3, res.r4, err
 }
 
+// Invoke5 has the same behavior as Invoke but with 5 return values.
 func Invoke5[R1 any, R2 any, R3 any, R4 any, R5 any](ctx context.Context, fn func() (R1, R2, R3, R4, R5, error)) (R1, R2, R3, R4, R5, error) {
 	type result struct {
 		r1 R1
@@ -121,6 +129,7 @@ func Invoke5[R1 any, R2 any, R3 any, R4 any, R5 any](ctx context.Context, fn fun
 	return res.r1, res.r2, res.r3, res.r4, res.r5, err
 }
 
+// Invoke6 has the same behavior as Invoke but with 6 return values.
 func Invoke6[R1 any, R2 any, R3 any, R4 any, R5 any, R6 any](ctx context.Context, fn func() (R1, R2, R3, R4, R5, R6, error)) (R1, R2, R3, R4, R5, R6, error) {
 	type result struct {
 		r1 R1

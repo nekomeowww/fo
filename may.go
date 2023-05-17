@@ -7,18 +7,23 @@ var (
 	internalMayHandlers = newMayHandlers()
 )
 
-// MayHandler is a function that handles the error from May and May* functions.
+// SetLoggers sets the global loggers for May and May* functions.
+//
+// NOTICE: This function will replace all the global existing handlers on
+// package fo level.
 func SetLoggers(logger ...Logger) {
-	mutex.Lock()
-	defer mutex.Unlock()
-	internalMayHandlers.handlers = make([]MayHandler, 0, len(logger))
-
+	handlers := make([]MayHandler, 0, len(logger))
 	for _, l := range logger {
-		internalMayHandlers.handlers = append(internalMayHandlers.handlers, WithLoggerHandler(l))
+		handlers = append(handlers, WithLoggerHandler(l))
 	}
+
+	SetHandlers(handlers...)
 }
 
 // SetHandlers sets the global handlers for May and May* functions.
+//
+// NOTICE: This function will replace all the global existing handlers on
+// package fo level.
 func SetHandlers(handler ...MayHandler) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -89,47 +94,4 @@ func May6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](t1 T1, t2 T2, t3 T3, t
 	may.mayHandlers = internalMayHandlers
 
 	return may.Invoke(t1, t2, t3, t4, t5, t6, err, messageArgs...)
-}
-
-// ErrorCollectable is an interface for collecting error,
-// the error could be the error combined by multierr.Combine().
-type ErrorCollectable interface {
-	getCollectedError() error
-}
-
-// ErrorsCollectable is an interface for collecting slice of errors.
-type ErrorsCollectable interface {
-	getCollectedErrors() []error
-}
-
-// CollectAsError collects error from the invoked result from MayInvoker
-// for post error handling.
-//
-// The error can be extracted with
-//
-//	multierr.Errors().
-func CollectAsError(collectable ErrorCollectable) error {
-	return collectable.getCollectedError()
-}
-
-// CollectAsErrors collects errors from the invoked result from
-// MayInvoker for post error handling.
-//
-// The errors can be combined with
-//
-//	multierr.Combine().
-func CollectAsErrors(collectable ErrorsCollectable) []error {
-	return collectable.getCollectedErrors()
-}
-
-// HandleErrors executes the handler with the collected error from
-// MayInvoker.
-func HandleErrors(collectable ErrorsCollectable, handler func(errs []error)) {
-	handler(collectable.getCollectedErrors())
-}
-
-// HandleErrorsWithReturn executes the handler with the collected error from
-// MayInvoker, and returns the error that handled by the handler.
-func HandleErrorsWithReturn(collectable ErrorsCollectable, handler func(errs []error) error) error {
-	return handler(collectable.getCollectedErrors())
 }

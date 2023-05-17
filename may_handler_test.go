@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/multierr"
 )
 
 func TestWithLoggerHandler(t *testing.T) {
@@ -112,28 +113,87 @@ func TestMayHandlersHandleError(t *testing.T) {
 	mayHandlers.handleError(assert.AnError, "error occurred: %s", "foo")
 }
 
-func TestGetCollectedError(t *testing.T) {
-	mayHandlers := newMayHandlers()
+func TestCollectAsError(t *testing.T) {
+	may := NewMay[string]()
 
-	mayHandlers.handleError(errors.New("test"))
-	mayHandlers.handleError(assert.AnError, "error occurred: %s", "foo")
+	may.Invoke("", errors.New("something went wrong"))
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail")
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail with %s", "foo")
 
-	err := mayHandlers.getCollectedError()
-	require.Error(t, err)
-	assert.EqualError(t, err, "test; error occurred: foo: assert.AnError general error for testing")
+	err := may.CollectAsError()
+	assert.EqualError(t, err, "something went wrong; operation shouldn't fail: something went wrong; operation shouldn't fail with foo: something went wrong")
 }
 
-func TestGetCollectedErrors(t *testing.T) {
-	mayHandlers := newMayHandlers()
+func TestCollectAsErrors(t *testing.T) {
+	may := NewMay[string]()
 
-	errs := mayHandlers.getCollectedErrors()
-	require.Empty(t, errs)
+	errs := may.CollectAsErrors()
+	assert.Empty(t, errs)
 
-	mayHandlers.handleError(errors.New("test"))
-	mayHandlers.handleError(assert.AnError, "error occurred: %s", "foo")
+	may.Invoke("", errors.New("something went wrong"))
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail")
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail with %s", "foo")
 
-	errs = mayHandlers.getCollectedErrors()
-	require.Len(t, errs, 2)
-	assert.EqualError(t, errs[0], "test")
-	assert.EqualError(t, errs[1], "error occurred: foo: assert.AnError general error for testing")
+	errs = may.CollectAsErrors()
+	assert.EqualError(t, errs[0], "something went wrong")
+	assert.EqualError(t, errs[1], "operation shouldn't fail: something went wrong")
+	assert.EqualError(t, errs[2], "operation shouldn't fail with foo: something went wrong")
+}
+
+func handleErrorTestFunc() (err error) {
+	may := NewMay[string]()
+
+	defer may.HandleErrors(func(errs []error) {
+		err = fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+	})
+
+	may.Invoke("", errors.New("something went wrong"))
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail")
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail with %s", "foo")
+
+	return nil
+}
+
+func TestHandleErrors(t *testing.T) {
+	err := handleErrorTestFunc()
+	assert.EqualError(t, err, "error occurred: something went wrong; operation shouldn't fail: something went wrong; operation shouldn't fail with foo: something went wrong")
+
+	err = nil
+
+	NewMay[string]().HandleErrors(func(errs []error) {
+		if len(errs) > 0 {
+			err = fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+		}
+	})
+	assert.NoError(t, err)
+}
+
+func handleErrorWithReturnTestFunc() (err error) {
+	may := NewMay[string]()
+
+	defer func() {
+		err = may.HandleErrorsWithReturn(func(errs []error) error {
+			return fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+		})
+	}()
+
+	may.Invoke("", errors.New("something went wrong"))
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail")
+	may.Invoke("", errors.New("something went wrong"), "operation shouldn't fail with %s", "foo")
+
+	return nil
+}
+
+func TestHandleErrorsWithReturn(t *testing.T) {
+	err := handleErrorWithReturnTestFunc()
+	assert.EqualError(t, err, "error occurred: something went wrong; operation shouldn't fail: something went wrong; operation shouldn't fail with foo: something went wrong")
+
+	err = NewMay[string]().HandleErrorsWithReturn(func(errs []error) error {
+		if len(errs) > 0 {
+			return fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+		}
+
+		return nil
+	})
+	assert.NoError(t, err)
 }

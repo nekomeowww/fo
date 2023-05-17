@@ -25,8 +25,6 @@ This library is v1 and follows SemVer strictly.
 
 No breaking changes will be made to exported APIs before v2.0.0.
 
-This library has no dependencies outside the Go standard library.
-
 ## 💡 Usage
 
 You can import `fo` using:
@@ -70,9 +68,6 @@ Error handling:
 - [May0 -> May6](#may0-6)
 - [NewMay](#newmay)
 - [NewMay0 -> NewMay6](#newmay0-6)
-- [CollectAsError](#collectaserror)
-- [CollectAsErrors](#collectaserrors)
-- [HandleErrors](#handleerrors)
 
 ### SetLogger
 
@@ -294,7 +289,7 @@ may := fo.NewMay[string]()
 val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
 val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
 
-err := CollectAsError(may) // error
+err := may.CollectAsError() // error
 // this error has been combined with go.uber.org/multierr.Combine(...).
 // You can use errors.Is(err, someErr) to check if the error contains some error.
 // Or just use multierr.Errors(err) to get the slice of errors.
@@ -310,12 +305,12 @@ may := fo.NewMay[string]()
 val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
 val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
 
-if err := CollectAsError(may); err != nil {
+if err := may.CollectAsError(); err != nil {
     return err
 }
 ```
 
-### CollectAsErrors
+#### CollectAsErrors
 
 Get the collected errors as a errors slice value from the `May` instance.
 
@@ -325,14 +320,14 @@ may := fo.NewMay[string]()
 val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
 val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
 
-errs := CollectAsErrors(may) // []error
+errs := may.CollectAsErrors() // []error
 // errs == []error{
 //     "parsing time \"bad-value\" as \"2006-01-02\": cannot parse \"bad-value\" as \"2006\"",
 //     "parsing time \"bad-value2\" as \"2006-01-02\": cannot parse \"bad-value2\" as \"2006\"",
 // }
 ```
 
-### HandleErrors
+#### HandleErrors
 
 Sometimes you may find out you need a unique way to handle the errors from a `May` instance,
 instead of using the injected handlers with `Use(...)`.
@@ -343,20 +338,20 @@ may := fo.NewMay[string]()
 val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
 val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
 
-HandleErrors(may, func (err error, v ...any) {
+may.HandleErrors(func (err error, v ...any) {
     fmt.Printf("error: %s\n", err)
 })
 ```
 
-Or perhaps you could return the collected errors when `defer`ing the `HandleErrors` call.
+Or perhaps you could return the collected errors when `defer`ing the `may.HandleErrors(...)` call.
 
 ```go
 func func1() (err error) {
-    defer HandleErrors(may, func (err error, v ...any) {
+    may := fo.NewMay[string]()
+
+    defer may.HandleErrors(may, func (err error, v ...any) {
         err = fmt.Printf("error: %s\n", err)
     })
-
-    may := fo.NewMay[string]()
 
     val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
     val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
@@ -371,9 +366,9 @@ func main() {
 }
 ```
 
-### HandleErrorsWithReturns
+#### HandleErrorsWithReturns
 
-`HandleErrorsWithReturns` is similar to `HandleErrors`, but it returns the handled errors.
+`may.HandleErrorsWithReturns(...)` is similar to `may.HandleErrors(...)`, but it returns the handled errors.
 
 ```go
 may := fo.NewMay[string]()
@@ -381,7 +376,7 @@ may := fo.NewMay[string]()
 val := may.Invoke(time.Parse("2006-01-02", "bad-value"))
 val2 := may.Invoke(time.Parse("2006-01-02", "bad-value2"))
 
-errs := HandleErrorsWithReturns(may, func (err error, v ...any) {
+errs := may.HandleErrorsWithReturns(func (err error, v ...any) {
     fmt.Printf("error: %s\n", err)
 })
 // errs == []error{
