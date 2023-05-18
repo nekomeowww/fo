@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func ExampleMay() {
+func ExampleNewMay() {
 	errFn := func() (string, error) {
 		return "", errors.New("an error")
 	}

@@ -102,6 +102,24 @@ func TestMay(t *testing.T) {
 	})
 }
 
+func ExampleMay() {
+	funcWithError := func() (int, error) {
+		return 0, errors.New("something went wrong")
+	}
+
+	funcWithNilErr := func() (int, error) {
+		return 42, nil
+	}
+
+	str := May(funcWithError())
+	str2 := May(funcWithNilErr())
+
+	fmt.Println(str)
+	fmt.Println(str2)
+	// Output: 0
+	// 42
+}
+
 func TestMayX(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		logger := newMayTestLogger()

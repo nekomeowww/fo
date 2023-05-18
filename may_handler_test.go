@@ -197,3 +197,98 @@ func TestHandleErrorsWithReturn(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
+
+func ExampleMayInvoker_HandleErrors() {
+	// Such scenario is useful when you want to handle errors in a defer statement
+	funcWithHandlingErrorsInDefer := func() (num int, num2 int, err error) {
+		may := NewMay[int]()
+
+		defer func() {
+			// Using defer to handle errors and assign the err into named return value
+			err = may.HandleErrorsWithReturn(func(errs []error) error {
+				return fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+			})
+		}()
+
+		funcWithErr := func() (int, error) {
+			return 0, errors.New("something went wrong")
+		}
+
+		funcWithNilErr := func() (int, error) {
+			return 42, nil
+		}
+
+		num = may.Invoke(funcWithErr())
+		num2 = may.Invoke(funcWithNilErr())
+
+		return num, num2, nil
+	}
+
+	num, num2, err := funcWithHandlingErrorsInDefer()
+	fmt.Println(num, num2, err)
+
+	// Such scenario is useful when you want to handle errors in a separated function
+	funcWithHandlingErrorsWithReformatting := func() (num int, num2 int, err error) { //nolint:unparam
+		may := NewMay[int]()
+
+		funcWithErr := func() (int, error) {
+			return 0, errors.New("something went wrong")
+		}
+
+		funcWithNilErr := func() (int, error) {
+			return 42, nil
+		}
+
+		num = may.Invoke(funcWithErr())
+		num2 = may.Invoke(funcWithNilErr())
+
+		may.HandleErrors(func(errs []error) {
+			fmt.Println("encountered errors:", errs)
+		})
+
+		return num, num2, nil
+	}
+
+	num, num2, err = funcWithHandlingErrorsWithReformatting()
+	fmt.Println(num, num2, err)
+	// Output: 0 42 error occurred: something went wrong
+	// encountered errors: [something went wrong]
+	// 0 42 <nil>
+}
+
+func ExampleMayInvoker_HandleErrorsWithReturn() {
+	criticalErr := errors.New("critical error")
+
+	// Such scenario is useful when you want to handle errors and then return a new one after
+	// reformatting, grouping, logging the errors or etc.
+	funcWithHandlingErrors := func() (num int, num2 int, err error) {
+		may := NewMay[int]()
+
+		funcWithErr := func() (int, error) {
+			return 0, criticalErr
+		}
+
+		funcWithNilErr := func() (int, error) {
+			return 42, nil
+		}
+
+		num = may.Invoke(funcWithErr())
+		num2 = may.Invoke(funcWithNilErr())
+
+		err = may.HandleErrorsWithReturn(func(errs []error) error {
+			for _, e := range errs {
+				if errors.Is(e, criticalErr) {
+					return fmt.Errorf("critical error occurred: %w", e)
+				}
+			}
+
+			return fmt.Errorf("error occurred: %w", multierr.Combine(errs...))
+		})
+
+		return num, num2, err
+	}
+
+	num, num2, err := funcWithHandlingErrors()
+	fmt.Println(num, num2, err)
+	// Output: 0 42 critical error occurred: critical error
+}

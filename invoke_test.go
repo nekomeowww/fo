@@ -3,6 +3,7 @@ package fo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -358,6 +359,19 @@ func TestInvokeX(t *testing.T) {
 			assert.Equal(t, "bar", res6["foo"])
 		})
 	})
+}
+
+func ExampleInvoke() {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*500)
+	defer cancel()
+
+	str, err := Invoke(ctx, func() (int, error) {
+		time.Sleep(time.Second)
+		return 0, nil
+	})
+
+	fmt.Println(str, err)
+	// Output: 0 context deadline exceeded
 }
 
 func BenchmarkInvoke(b *testing.B) {
