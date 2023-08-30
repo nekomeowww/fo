@@ -1,4 +1,4 @@
-# fo - function calling utilities and controls...
+# fo - function calling utilities and controls
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/sourcegraph/conc.svg)](https://pkg.go.dev/github.com/sourcegraph/conc)
 [![tag](https://img.shields.io/github/tag/nekomeowww/fo.svg)](https://github.com/nekomeowww/fo/releases)
@@ -62,6 +62,10 @@ Function helpers:
 
 - [Invoke](#invoke)
 - [Invoke0 -> Invoke6](#invoke0-6)
+- [InvokeWith](#invokewith)
+- [InvokeWith0 -> InvokeWith6](#invokewith0-6)
+- [InvokeWithTimeout](#invokewithtimeout)
+- [InvokeWithTimeout0 -> InvokeWithTimeout6](#invokewithtimeout0-6)
 
 Error handling:
 
@@ -156,6 +160,104 @@ defer cancel7()
 
 val1, val2, val3, val4, val5, val6, err1 := fo.Invoke6(ctx1, example6())
 ```
+
+### InvokeWith
+
+A short cut to `Invoke` with `context.Context` that wrapped internally.
+
+```go
+val, err := fo.InvokeWith(func() (string, error) {
+    time.Sleep(2 * time.Second)
+    return "John", nil
+}, fo.WithContextTimeout(1*time.Second))
+// val == ""
+// err == context deadline exceeded
+```
+
+### InvokeWith{0->6}
+
+InvokeWith\* has the same behavior as InvokeWith, but returns multiple values.
+
+```go
+func example0() (error) {}
+func example1() (int, error) {}
+func example2() (int, string, error) {}
+func example3() (int, string, time.Date, error) {}
+func example4() (int, string, time.Date, bool, error) {}
+func example5() (int, string, time.Date, bool, float64, error) {}
+func example6() (int, string, time.Date, bool, float64, byte, error) {}
+
+
+err1 := fo.InvokeWith0(ctx1, example0(), fo.WithContextTimeout(1*time.Second))
+
+
+val1, err1 := fo.InvokeWith1(ctx1, example1(), fo.WithContextTimeout(1*time.Second)) // alias to InvokeWith
+
+
+val1, val2, err1 := fo.InvokeWith2(ctx1, example2(), fo.WithContextTimeout(1*time.Second))
+
+
+val1, val2, val3, err1 := fo.InvokeWith3(ctx1, example3(), fo.WithContextTimeout(1*time.Second))
+
+
+val1, val2, val3, val4, err1 := fo.InvokeWith4(ctx1, example4(), fo.WithContextTimeout(1*time.Second))
+
+
+val1, val2, val3, val4, val5, err1 := fo.InvokeWith5(ctx1, example5(), fo.WithContextTimeout(1*time.Second))
+
+
+val1, val2, val3, val4, val5, val6, err1 := fo.InvokeWith6(ctx1, example6(), fo.WithContextTimeout(1*time.Second))
+```
+
+### InvokeWithTimeout
+
+A short cut to `Invoke` with `context.Context` that wrapped internally and defaults to set `fo.WithContextTimeout(...)`.
+
+```go
+val, err := fo.InvokeWithTimeout(func() (string, error) {
+    time.Sleep(2 * time.Second)
+    return "John", nil
+}, 1*time.Second)
+// val == ""
+// err == context deadline exceeded
+```
+
+### InvokeWithTimeout{0->6}
+
+InvokeWithTimeout\* has the same behavior as InvokeWithTimeout, but returns multiple values.
+
+```go
+func example0() (error) {}
+func example1() (int, error) {}
+func example2() (int, string, error) {}
+func example3() (int, string, time.Date, error) {}
+func example4() (int, string, time.Date, bool, error) {}
+func example5() (int, string, time.Date, bool, float64, error) {}
+func example6() (int, string, time.Date, bool, float64, byte, error) {}
+
+
+err1 := fo.InvokeWithTimeout0(ctx1, example0(), 1*time.Second)
+
+
+val1, err1 := fo.InvokeWithTimeout1(ctx1, example1(), 1*time.Second) // alias to InvokeWithTimeout
+
+
+val1, val2, err1 := fo.InvokeWithTimeout2(ctx1, example2(), 1*time.Second)
+
+
+val1, val2, val3, err1 := fo.InvokeWithTimeout3(ctx1, example3(), 1*time.Second)
+
+
+val1, val2, val3, val4, err1 := fo.InvokeWithTimeout4(ctx1, example4(), 1*time.Second)
+
+
+val1, val2, val3, val4, val5, err1 := fo.InvokeWithTimeout5(ctx1, example5(), 1*time.Second)
+
+
+val1, val2, val3, val4, val5, val6, err1 := fo.InvokeWithTimeout6(ctx1, example6(), 1*time.Second)
+```
+
+```go
 
 ### May
 
