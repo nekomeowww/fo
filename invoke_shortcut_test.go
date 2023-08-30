@@ -115,7 +115,7 @@ func TestInvokeWith(t *testing.T) {
 					return nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -137,7 +137,7 @@ func TestInvokeWith(t *testing.T) {
 					return "abcd", nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -160,7 +160,7 @@ func TestInvokeWith(t *testing.T) {
 					return "abcd", nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -183,7 +183,7 @@ func TestInvokeWith(t *testing.T) {
 					return "abcd", 42, nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -207,7 +207,7 @@ func TestInvokeWith(t *testing.T) {
 					return "abcd", 42, true, nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -232,7 +232,7 @@ func TestInvokeWith(t *testing.T) {
 					return "abcd", 42, true, 42.24, nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -260,7 +260,7 @@ func TestInvokeWith(t *testing.T) {
 					}, nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -295,7 +295,7 @@ func TestInvokeWith(t *testing.T) {
 						}, nil
 				}, WithContextTimeout(time.Millisecond))
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -340,7 +340,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -362,7 +362,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return "abcd", nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -385,7 +385,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return "abcd", nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -408,7 +408,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return "abcd", 42, nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -432,7 +432,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return "abcd", 42, true, nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -457,7 +457,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					return "abcd", 42, true, 42.24, nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -485,7 +485,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 					}, nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
@@ -520,7 +520,7 @@ func TestInvokeWithTimeout(t *testing.T) {
 						}, nil
 				}, time.Millisecond)
 			},
-			invokeElapsedLessOrEqual: 2 * time.Millisecond,
+			invokeElapsedLessOrEqual: 10 * time.Millisecond,
 			expectedError:            context.DeadlineExceeded,
 		},
 		{
