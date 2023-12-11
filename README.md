@@ -1,6 +1,5 @@
 # fo - function calling utilities and controls
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/sourcegraph/conc.svg)](https://pkg.go.dev/github.com/sourcegraph/conc)
 [![tag](https://img.shields.io/github/tag/nekomeowww/fo.svg)](https://github.com/nekomeowww/fo/releases)
 ![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.20-%23007d9c)
 [![GoDoc](https://godoc.org/github.com/nekomeowww/fo?status.svg)](https://pkg.go.dev/github.com/nekomeowww/fo)
