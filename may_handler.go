@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"go.uber.org/multierr"
+	"go.uber.org/zap"
 )
 
 var (
@@ -34,6 +35,43 @@ func WithLoggerHandler(l Logger) MayHandler {
 func WithLogFuncHandler(logFunc func(...any)) MayHandler {
 	return func(err error, messageArgs ...any) {
 		logFunc(formatErrorWithMessageArgs(err, messageArgs...))
+	}
+}
+
+// WithZapLoggerHandler returns a MayHandler that logs the error with the
+// given zap logger. It will automatically assert whether the passed args are zap.Field
+// and convert the messageArgs zap.Field if it is not a string with error_field prefix.
+//
+// Usage:
+//
+//	may := fo.NewMay()
+//	may.Use(fo.WithZapLoggerHandler(zapLogger))
+//	may.Invoke(os.Open("./test_file.json"), "failed to open file", zap.String("file", "test_file.json"))
+func WithZapLoggerFuncHandler(logFunc func(message string, fields ...zap.Field)) MayHandler {
+	return func(err error, messageArgs ...any) {
+		if len(messageArgs) == 0 {
+			logFunc(err.Error())
+			return
+		}
+		prefix, _ := messageArgs[0].(string)
+
+		if len(messageArgs) == 1 {
+			logFunc(prefix, zap.Error(err))
+			return
+		}
+		fields := make([]zap.Field, 0)
+		fields = append(fields, zap.Error(err))
+
+		for i, v := range messageArgs[1:] {
+			field, ok := v.(zap.Field)
+			if !ok {
+				fields = append(fields, zap.Any(fmt.Sprintf("error_field_%d", i), field))
+			} else {
+				fields = append(fields, field)
+			}
+		}
+
+		logFunc(prefix, fields...)
 	}
 }
 
