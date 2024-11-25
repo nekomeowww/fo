@@ -2,6 +2,14 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:recommended",
-        ":configMigration"
+        ":dependencyDashboard",
+        ":semanticPrefixFixDepsChoreOthers",
+        ":prHourlyLimitNone",
+        ":prConcurrentLimitNone",
+        ":ignoreModulesAndTests",
+        "schedule:monthly",
+        "group:allNonMajor",
+        "replacements:all",
+        "workarounds:all"
     ]
 }
