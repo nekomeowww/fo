@@ -502,6 +502,21 @@ fmt.Println(val, val2, err)
 
 Helper naming: helpers must be self explanatory and respect standards (other languages, libraries...). Feel free to suggest many names in your contributions.
 
+## 👪 Other family members of `anyo`
+
+- [nekomeowww/xo](https://github.com/nekomeowww/xo): Mega utility & helper & extension library for Go
+- [nekomeowww/bo](https://github.com/nekomeowww/bo): BootKit for easily bootstrapping multi-goroutine applications, CLIs
+- [nekomeowww/tgo](https://github.com/nekomeowww/tgo): Telegram bot framework for Go
+- [nekomeowww/wso](https://github.com/nekomeowww/wso): WebSocket utility library for Go
+
+## 🎆 Other cool related Golang projects I made & maintained
+
+- [nekomeowww/factorio-rcon-api](https://github.com/nekomeowww/factorio-rcon-api): Fully implemented wrapper for Factorio RCON as API
+- [Kollama - Ollama Operator](https://github.com/knoway-dev/knoway): Kubernetes Operator for managing Ollama instances across multiple clusters
+- [lingticio/llmg](https://github.com/lingticio/llmg): LLM Gateway with gRPC, WebSocket, and RESTful API adapters included.
+- [nekomeowww/hyphen](https://github.com/nekomeowww/hyphen): An elegant URL Shortener service
+- [nekomeowww/insights-bot](https://github.com/nekomeowww/insights-bot): Webpage summary & chat history recap bot for Telegram
+
 ## 📝 License
 
 Copyright © 2023 [Neko Ayaka](https://github.com/nekomeowww).
