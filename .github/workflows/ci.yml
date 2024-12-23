@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "^1.22.6"
+          go-version: "^1.23"
           cache: true
 
       # Get values for cache paths to be used in later steps
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v5
         with:
-          go-version: "^1.22.6"
+          go-version: "^1.23"
           cache: true
 
       - uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "^1.22.6"
+          go-version: "^1.23"
           cache: true
 
       # Get values for cache paths to be used in later steps
