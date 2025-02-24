@@ -2,10 +2,9 @@ package fo
 
 import (
 	"context"
-	"sync"
 )
 
-func invoke[R any](ctx context.Context, fn func() (R, error)) (R, error) {
+func invoke[R any](ctx context.Context, fn func() (R, error)) (r R, e error) {
 	var res R
 	var err error
 
@@ -16,22 +15,15 @@ func invoke[R any](ctx context.Context, fn func() (R, error)) (R, error) {
 		resChan <- struct{}{}
 	}()
 
-	var wg sync.WaitGroup
+	select {
+	case <-ctx.Done():
+		e = ctx.Err()
+	case <-resChan:
+		r = res
+		e = err
+	}
 
-	wg.Add(1)
-
-	go func() {
-		select {
-		case <-ctx.Done():
-			err = ctx.Err()
-		case <-resChan:
-		}
-
-		wg.Done()
-	}()
-	wg.Wait()
-
-	return res, err
+	return
 }
 
 // Invoke0 has the same behavior as Invoke but without return value.
