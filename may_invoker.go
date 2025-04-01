@@ -40,7 +40,7 @@ func (f *MayInvoker[T]) Invoke(t1 T, err any, messageArgs ...any) T {
 		return t1
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1
 }
@@ -75,7 +75,7 @@ func (f *MayInvoker0) Invoke(anyErr any, messageArgs ...any) {
 		return
 	}
 
-	f.mayHandlers.handleError(anyErr, messageArgs...)
+	f.handleError(anyErr, messageArgs...)
 }
 
 // MayInvoker2 is a helper instance behaves like MayInvoker, but
@@ -107,7 +107,7 @@ func (f *MayInvoker2[T1, T2]) Invoke(t1 T1, t2 T2, err any, messageArgs ...any) 
 		return t1, t2
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1, t2
 }
@@ -141,7 +141,7 @@ func (f *MayInvoker3[T1, T2, T3]) Invoke(t1 T1, t2 T2, t3 T3, err any, messageAr
 		return t1, t2, t3
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1, t2, t3
 }
@@ -175,7 +175,7 @@ func (f *MayInvoker4[T1, T2, T3, T4]) Invoke(t1 T1, t2 T2, t3 T3, t4 T4, err any
 		return t1, t2, t3, t4
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1, t2, t3, t4
 }
@@ -209,7 +209,7 @@ func (f *MayInvoker5[T1, T2, T3, T4, T5]) Invoke(t1 T1, t2 T2, t3 T3, t4 T4, t5 
 		return t1, t2, t3, t4, t5
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1, t2, t3, t4, t5
 }
@@ -243,7 +243,7 @@ func (f *MayInvoker6[T1, T2, T3, T4, T5, T6]) Invoke(t1 T1, t2 T2, t3 T3, t4 T4,
 		return t1, t2, t3, t4, t5, t6
 	}
 
-	f.mayHandlers.handleError(err, messageArgs...)
+	f.handleError(err, messageArgs...)
 
 	return t1, t2, t3, t4, t5, t6
 }
