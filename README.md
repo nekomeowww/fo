@@ -256,8 +256,6 @@ val1, val2, val3, val4, val5, err1 := fo.InvokeWithTimeout5(ctx1, example5(), 1*
 val1, val2, val3, val4, val5, val6, err1 := fo.InvokeWithTimeout6(ctx1, example6(), 1*time.Second)
 ```
 
-```go
-
 ### May
 
 Wraps a function call and filter out the error values and only returns with the result values.
