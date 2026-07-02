@@ -1,11 +1,14 @@
 package fo
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"reflect"
 	"sync"
 
+	"github.com/samber/lo"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
@@ -53,12 +56,14 @@ func WithZapLoggerFuncHandler(logFunc func(message string, fields ...zap.Field))
 			logFunc(err.Error())
 			return
 		}
+
 		prefix, _ := messageArgs[0].(string)
 
 		if len(messageArgs) == 1 {
 			logFunc(prefix, zap.Error(err))
 			return
 		}
+
 		fields := make([]zap.Field, 0)
 		fields = append(fields, zap.Error(err))
 
@@ -72,6 +77,88 @@ func WithZapLoggerFuncHandler(logFunc func(message string, fields ...zap.Field))
 		}
 
 		logFunc(prefix, fields...)
+	}
+}
+
+// WithSlogLoggerFuncHandler returns a MayHandler that logs the error with the
+// given slog logger. It will automatically assert whether the passed args are slog.Attr
+// and convert the messageArgs slog.Attr if it is not a string with error_field prefix.
+//
+// Usage:
+//
+//	may := fo.NewMay()
+//	may.Use(fo.WithSlogLoggerFuncHandler(slog.Error))
+//	may.Invoke(os.Open("./test_file.json"), "failed to open file", slog.String("file", "test_file.json"))
+func WithSlogLoggerFuncHandler(logFunc func(msg string, args ...any)) MayHandler {
+	return func(err error, messageArgs ...any) {
+		if len(messageArgs) == 0 {
+			logFunc("error occurred", slog.Any("error", err.Error()))
+			return
+		}
+
+		prefix, _ := messageArgs[0].(string)
+
+		if len(messageArgs) == 1 {
+			logFunc(prefix, slog.Any("error", err.Error()))
+			return
+		}
+
+		attrs := make([]slog.Attr, 0)
+		attrs = append(attrs, slog.Any("error", err.Error()))
+
+		for i, v := range messageArgs[1:] {
+			field, ok := v.(slog.Attr)
+			if !ok {
+				attrs = append(attrs, slog.Any(fmt.Sprintf("error_field_%d", i), field))
+			} else {
+				attrs = append(attrs, field)
+			}
+		}
+
+		logFunc(prefix, lo.Map(attrs, func(attr slog.Attr, _ int) any {
+			return attr
+		})...)
+	}
+}
+
+// WithSlogContextLoggerFuncHandler returns a MayHandler that logs the error with the
+// given slog logger. It will automatically assert whether the passed args are slog.Attr
+// and convert the messageArgs slog.Attr if it is not a string with error_field prefix.
+//
+// Usage:
+//
+//	may := fo.NewMay()
+//	may.Use(fo.WithSlogContextLoggerFuncHandler(slogHandler.ErrorContext))
+//	may.Invoke(os.Open("./test_file.json"), "failed to open file", slog.String("file", "test_file.json"))
+func WithSlogContextLoggerFuncHandler(logFunc func(ctx context.Context, msg string, args ...any)) MayHandler {
+	return func(err error, messageArgs ...any) {
+		if len(messageArgs) == 0 {
+			logFunc(context.Background(), "error occurred", slog.Any("error", err.Error()))
+			return
+		}
+
+		prefix, _ := messageArgs[0].(string)
+
+		if len(messageArgs) == 1 {
+			logFunc(context.Background(), prefix, slog.Any("error", err.Error()))
+			return
+		}
+
+		attrs := make([]slog.Attr, 0)
+		attrs = append(attrs, slog.Any("error", err.Error()))
+
+		for i, v := range messageArgs[1:] {
+			field, ok := v.(slog.Attr)
+			if !ok {
+				attrs = append(attrs, slog.Any(fmt.Sprintf("error_field_%d", i), field))
+			} else {
+				attrs = append(attrs, field)
+			}
+		}
+
+		logFunc(context.Background(), prefix, lo.Map(attrs, func(attr slog.Attr, _ int) any {
+			return attr
+		})...)
 	}
 }
 

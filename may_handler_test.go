@@ -3,6 +3,8 @@ package fo
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log/slog"
 	"strings"
 	"testing"
 
@@ -99,6 +101,40 @@ func TestFormatError(t *testing.T) {
 	assert.PanicsWithValue(t, "may: invalid err type '[]string', should either be a bool or an error", func() {
 		_ = formatError([]string{"foo", "bar"})
 	})
+}
+
+var _ io.Writer = (*mockedWriter)(nil)
+
+type mockedWriter struct {
+	written []byte
+}
+
+func (m *mockedWriter) Write(p []byte) (n int, err error) {
+	m.written = append(m.written, p...)
+	return len(p), nil
+}
+
+func TestWithSlogLoggerFuncHandler(t *testing.T) {
+	t.Parallel()
+
+	newMay1 := NewMay2[string, error]().Use(WithSlogLoggerFuncHandler(slog.Error))
+	assert.NotPanics(t, func() {
+		newMay1.Invoke("", assert.AnError, assert.AnError, "error occurred: %s", "foo")
+	})
+}
+
+func TestWithSlogContextLoggerFuncHandler(t *testing.T) {
+	t.Parallel()
+
+	writer := new(mockedWriter)
+	slogHandler := slog.New(slog.NewTextHandler(writer, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	newMay2 := NewMay2[string, error]().Use(WithSlogContextLoggerFuncHandler(slogHandler.ErrorContext))
+
+	assert.NotPanics(t, func() {
+		newMay2.Invoke("", assert.AnError, assert.AnError, "error occurred: %s", "foo")
+	})
+
+	assert.Contains(t, string(writer.written), "level=ERROR msg=\"error occurred: %s\" error=\"assert.AnError general error for testing\" error_field_0=\"=<nil>\"")
 }
 
 func TestMayHandlersHandleError(t *testing.T) {
